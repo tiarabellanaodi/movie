@@ -31,7 +31,7 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final carouselHeight = screenHeight * 0.5; // Responsive height
+    final carouselHeight = screenHeight * 0.5; 
 
     return Column(
       children: [
@@ -54,7 +54,6 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
           ),
         ),
 
-        // Carousel
         SizedBox(
           height: carouselHeight,
           child: PageView.builder(
@@ -150,7 +149,6 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
                             ),
                           ),
 
-                          // Play Button
                           Positioned(
                             right: 16,
                             bottom: 16,
@@ -158,7 +156,6 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
                               backgroundColor: Colors.amber,
                               foregroundColor: Colors.black,
                               onPressed: () {
-                                // Handle play action
                               },
                               child: const Icon(Icons.play_arrow),
                             ),
@@ -173,7 +170,6 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
           ),
         ),
 
-        // Page Indicators
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

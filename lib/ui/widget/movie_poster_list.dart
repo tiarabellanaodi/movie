@@ -16,16 +16,15 @@ class MoviePosterList extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     
-    // Calculate responsive width based on screen size
     double itemWidth;
     if (screenWidth < 350) {
-      itemWidth = 100; // Very small screens
+      itemWidth = 100; 
     } else if (screenWidth < 400) {
-      itemWidth = 110; // Small screens
+      itemWidth = 110; 
     } else if (screenWidth < 500) {
-      itemWidth = 120; // Medium screens
+      itemWidth = 120; 
     } else {
-      itemWidth = isResponsive ? screenWidth * 0.25 : 120; // Large screens
+      itemWidth = isResponsive ? screenWidth * 0.25 : 120; 
     }
 
     return SizedBox(
@@ -62,7 +61,6 @@ class MoviePosterList extends StatelessWidget {
                     },
                   ),
                   
-                  // Gradient overlay for better text readability
                   Container(
                     width: itemWidth,
                     height: height,
@@ -79,7 +77,6 @@ class MoviePosterList extends StatelessWidget {
                     ),
                   ),
                   
-                  // Movie number badge
                   Positioned(
                     top: 8,
                     left: 8,

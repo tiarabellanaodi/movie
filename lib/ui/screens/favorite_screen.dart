@@ -1,4 +1,3 @@
-// favorite_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie/provider/movie_provider.dart';
@@ -33,7 +32,6 @@ class FavoriteScreen extends ConsumerWidget {
               ),
             ),
             
-            // List menggunakan Consumer untuk rebuild otomatis
             Expanded(
               child: Consumer(
                 builder: (context, ref, child) {
@@ -54,7 +52,6 @@ class FavoriteScreen extends ConsumerWidget {
                               color: movie['isFavorite'] ? Colors.red : Colors.grey,
                             ),
                             onPressed: () {
-                              // Remove from favorites menggunakan state management
                               ref.read(favoriteMoviesProvider.notifier).state = 
                                   List.from(favorites)..removeAt(index);
                             },

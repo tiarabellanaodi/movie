@@ -21,7 +21,7 @@ class HomeScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Now Playing Section dengan loading state
+              // Now Playing Section
               Consumer(
                 builder: (context, ref, child) {
                   final nowPlayingState = ref.watch(nowPlayingProvider);
