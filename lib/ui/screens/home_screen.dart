@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';  // TAMBAH IMPORT
 import 'package:movie/provider/movie_provider.dart';
 import '../widget/now_playing_section.dart';
-import '../../provider/movie_provider.dart';
 import '../widget/movie_section.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -71,6 +71,10 @@ class HomeScreen extends ConsumerWidget {
                       title: 'Trending',
                       list: movies,
                       posterHeight: 160,
+                      onMorePressed: () {
+                        // Navigasi ke halaman category dengan go_router
+                        context.push('/category/trending');
+                      },
                     ),
                   );
                 },
@@ -88,6 +92,10 @@ class HomeScreen extends ConsumerWidget {
                       title: 'Popular',
                       list: movies,
                       posterHeight: 160,
+                      onMorePressed: () {
+                        // Navigasi ke halaman category dengan go_router
+                        context.push('/category/popular');
+                      },
                     ),
                   );
                 },
@@ -105,6 +113,10 @@ class HomeScreen extends ConsumerWidget {
                       title: 'Top Rated',
                       list: movies,
                       posterHeight: 160,
+                      onMorePressed: () {
+                        // Navigasi ke halaman category dengan go_router
+                        context.push('/category/top_rated');
+                      },
                     ),
                   );
                 },
@@ -117,6 +129,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  // Fungsi _buildSectionLoading dan _buildSectionError tetap sama
   Widget _buildSectionLoading(String title) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

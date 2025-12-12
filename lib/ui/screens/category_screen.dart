@@ -16,7 +16,7 @@ class CategoryScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0F0F0F),
         title: Text(
-          category,
+          category.toUpperCase(),
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,

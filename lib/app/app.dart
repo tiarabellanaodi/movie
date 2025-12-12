@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-
-import '../ui/screens/main_screen.dart';
+import 'package:go_router/go_router.dart';
+import '/router/router.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: MainScreen());
+    return MaterialApp.router( 
+      routerConfig: router,
+    );
   }
 }

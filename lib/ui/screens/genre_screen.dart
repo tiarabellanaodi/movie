@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class GenreScreen extends StatelessWidget {
   const GenreScreen({super.key});
@@ -55,18 +56,6 @@ class GenreScreen extends StatelessWidget {
     },
   ];
 
-  void _navigateToGenreDetail(BuildContext context, String genreName, List<String> movies) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GenreDetailScreen(
-          genreName: genreName,
-          movies: movies,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,69 +104,16 @@ class GenreScreen extends StatelessWidget {
                         Icons.chevron_right,
                         color: Colors.white54,
                       ),
-                      onTap: () => _navigateToGenreDetail(
-                        context,
-                        genre['name'],
-                        List<String>.from(genre['movies']),
-                      ),
+                      onTap: () {
+                        // Navigasi dengan go_router
+                        context.push('/category/${genre['name']}');
+                      },
                     ),
                   );
                 },
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class GenreDetailScreen extends StatelessWidget {
-  final String genreName;
-  final List<String> movies;
-
-  const GenreDetailScreen({
-    super.key,
-    required this.genreName,
-    required this.movies,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0F0F0F),
-        title: Text(
-          genreName,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SafeArea(
-        child: GridView.builder(
-          padding: const EdgeInsets.all(12),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 2 / 3,
-          ),
-          itemCount: movies.length,
-          itemBuilder: (context, index) {
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                movies[index],
-                fit: BoxFit.cover,
-              ),
-            );
-          },
         ),
       ),
     );
