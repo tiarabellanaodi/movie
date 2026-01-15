@@ -8,6 +8,8 @@ class NowPlayingSection extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<NowPlayingSection> createState() => _NowPlayingSectionState();
+
+  
 }
 
 class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
@@ -153,6 +155,7 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
                             right: 16,
                             bottom: 16,
                             child: FloatingActionButton.small(
+                              heroTag: null,
                               backgroundColor: Colors.amber,
                               foregroundColor: Colors.black,
                               onPressed: () {
