@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movie/models/movie.dart';
+import 'package:movie/provider/movie_provider.dart';
 
 class NowPlayingSection extends ConsumerStatefulWidget {
-  final List<Map<String, dynamic>> movies;
+  final List<Movie> movies;
 
   const NowPlayingSection({super.key, required this.movies});
 
   @override
   ConsumerState<NowPlayingSection> createState() => _NowPlayingSectionState();
-
-  
 }
 
 class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
@@ -33,7 +33,8 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final carouselHeight = screenHeight * 0.5; 
+    final carouselHeight = screenHeight * 0.5;
+    final firestoreService = ref.watch(firestoreServiceProvider);
 
     return Column(
       children: [
@@ -62,15 +63,22 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
             controller: _controller,
             itemCount: widget.movies.length,
             itemBuilder: (context, index) {
-              final item = widget.movies[index];
+              final movie = widget.movies[index];
               final isActive = index == _currentIndex;
               
+              // Check if image is from network or assets
+              final isNetworkImage = movie.image.startsWith('http://') || 
+                                    movie.image.startsWith('https://');
+
               return AnimatedScale(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
                 scale: isActive ? 1.0 : 0.92,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   child: Card(
                     elevation: 4,
                     shape: RoundedRectangleBorder(
@@ -81,12 +89,54 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
                       child: Stack(
                         children: [
                           // Movie Image
-                          Image.asset(
-                            item['image']!,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
+                          isNetworkImage
+                              ? Image.network(
+                                  movie.image,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      color: Colors.grey[800],
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress.expectedTotalBytes != null
+                                              ? loadingProgress.cumulativeBytesLoaded /
+                                                  loadingProgress.expectedTotalBytes!
+                                              : null,
+                                          color: Colors.amber,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: Colors.grey[800],
+                                      child: const Icon(
+                                        Icons.broken_image,
+                                        color: Colors.white54,
+                                        size: 60,
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Image.asset(
+                                  movie.image,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: Colors.grey[800],
+                                      child: const Icon(
+                                        Icons.broken_image,
+                                        color: Colors.white54,
+                                        size: 60,
+                                      ),
+                                    );
+                                  },
+                                ),
 
                           // Gradient Overlay
                           Container(
@@ -112,7 +162,7 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  item['title']!,
+                                  movie.title,
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -123,7 +173,7 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
-                                  '${item['genre'] ?? 'Action'} | ${item['year'] ?? '2024'}',
+                                  '${movie.genre} | ${movie.year}',
                                   style: const TextStyle(
                                     color: Colors.white70,
                                     fontSize: 14,
@@ -139,7 +189,7 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      item['rating']?.toString() ?? '8.0',
+                                      movie.rating.toStringAsFixed(1),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500,
@@ -151,16 +201,48 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
                             ),
                           ),
 
+                          // Play Button
                           Positioned(
                             right: 16,
                             bottom: 16,
                             child: FloatingActionButton.small(
-                              heroTag: null,
+                              heroTag: 'play_$index',
                               backgroundColor: Colors.amber,
                               foregroundColor: Colors.black,
                               onPressed: () {
+                                // TODO: Navigate to movie detail
                               },
                               child: const Icon(Icons.play_arrow),
+                            ),
+                          ),
+
+                          // Favorite Button
+                          Positioned(
+                            top: 16,
+                            right: 16,
+                            child: GestureDetector(
+                              onTap: () {
+                                firestoreService.toggleFavorite(
+                                  movie.id,
+                                  movie.isFavorite,
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.6),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  movie.isFavorite
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: movie.isFavorite
+                                      ? Colors.red
+                                      : Colors.white,
+                                  size: 20,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -174,6 +256,8 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
         ),
 
         const SizedBox(height: 8),
+
+        // Page Indicator
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
@@ -184,8 +268,8 @@ class _NowPlayingSectionState extends ConsumerState<NowPlayingSection> {
               margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _currentIndex == index 
-                    ? Colors.amber 
+                color: _currentIndex == index
+                    ? Colors.amber
                     : Colors.white.withOpacity(0.3),
               ),
             ),

@@ -1,63 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:movie/provider/movie_provider.dart';
 
-class GenreScreen extends StatelessWidget {
+class GenreScreen extends ConsumerWidget {
   const GenreScreen({super.key});
 
-  final List<Map<String, dynamic>> genres = const [
-    {
-      'name': 'Action',
-      'movies': [
-        'assets/images/deadpool.jpg',
-        'assets/images/batman.jpg',
-        'assets/images/avatar.jpg',
-        'assets/images/spiderman.jpg',
-      ]
-    },
-    {
-      'name': 'Adventure',
-      'movies': [
-        'assets/images/inter.jpg',
-        'assets/images/lor.jpg',
-        'assets/images/narnia.jpg',
-        'assets/images/pirates.jpg',
-      ]
-    },
-    {
-      'name': 'Fantasy',
-      'movies': [
-        'assets/images/hp.jpg',
-        'assets/images/httyd.jpg',
-        'assets/images/narnia.jpg',
-        'assets/images/lor.jpg',
-      ]
-    },
-    {
-      'name': 'Sci-Fi',
-      'movies': [
-        'assets/images/inter.jpg',
-        'assets/images/avatar.jpg',
-        'assets/images/mr.jpg',
-      ]
-    },
-    {
-      'name': 'Drama',
-      'movies': [
-        'assets/images/mr.jpg',
-        'assets/images/inter.jpg',
-      ]
-    },
-    {
-      'name': 'Comedy',
-      'movies': [
-        'assets/images/deadpool.jpg',
-        'assets/images/mr.jpg',
-      ]
-    },
-  ];
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final genresAsync = ref.watch(genresProvider);
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -81,34 +33,76 @@ class GenreScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Genre List
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                itemCount: genres.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 8),
-                itemBuilder: (context, index) {
-                  final genre = genres[index];
-                  return Card(
-                    color: const Color(0xFF1A1A1A),
-                    child: ListTile(
-                      title: Text(
-                        genre['name'],
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
+              child: genresAsync.when(
+                loading: () => const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.amber,
+                  ),
+                ),
+                error: (error, stack) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 48,
                       ),
-                      trailing: const Icon(
-                        Icons.chevron_right,
-                        color: Colors.white54,
+                      const SizedBox(height: 16),
+                      Text(
+                        'Error loading genres',
+                        style: const TextStyle(color: Colors.white70),
                       ),
-                      onTap: () {
-                        // Navigasi dengan go_router
-                        context.push('/category/${genre['name']}');
-                      },
+                    ],
+                  ),
+                ),
+                data: (genres) {
+                  if (genres.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'No genres available',
+                        style: TextStyle(color: Colors.white54),
+                      ),
+                    );
+                  }
+
+                  return ListView.separated(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
                     ),
+                    itemCount: genres.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final genre = genres[index];
+                      return Card(
+                        color: const Color(0xFF1A1A1A),
+                        child: ListTile(
+                          leading: Text(
+                            genre['icon'] ?? '🎬',
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                          title: Text(
+                            genre['name'],
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.chevron_right,
+                            color: Colors.white54,
+                          ),
+                          onTap: () {
+                            context.push('/category/${genre['name']}');
+                          },
+                        ),
+                      );
+                    },
                   );
                 },
               ),
